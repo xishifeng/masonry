@@ -1,0 +1,105 @@
+@charset "utf-8";
+*{
+	margin: 0;
+	padding: 0;
+}
+
+header{
+	font-size: 0.3rem;
+	background-color: coral;
+	text-align: center;
+	line-height: 0.6rem;
+	position: fixed;
+	z-index: 120;
+	top: 0;
+	left: 0;
+	width: 100%;
+}
+#chengHeight{
+	height: 0.6rem;
+}
+
+ul{
+	overflow: hidden;
+	padding-left: 0.1rem;
+	padding-right: 0.1rem;
+}
+
+li{
+	list-style: none;
+	width: 50%;
+	float: left;
+	overflow: hidden;
+	padding: 0 0.033rem;
+	box-sizing: border-box;
+}
+
+li.l-li{}
+li.r-li{}
+
+li>div{
+	width: 100%;
+	overflow: hidden;
+	position: relative;
+}
+li>div>img{
+	width: 100%;
+	float: left;
+}
+li>div>p{
+	font-size: 0.28rem;
+	line-height: 0.6rem;
+	clear: both;
+	text-align: center;
+}
+
+span.log-re{
+	position: absolute;
+	top: 0;
+	left: 0;
+	text-align: center;
+	width: 1.5rem;
+	height: 1.5rem;
+	z-index: 100;
+}
+span.log-re::before{
+	position: absolute;
+	top: 0;
+	left: -0.5rem;
+	width: 2rem;
+	content: "热销";
+	-webkit-transform: rotateZ(-45deg);
+	background-color: #f53049;
+	letter-spacing: 0.1rem;
+	color: white;
+	font-size: 0.26rem;
+	line-height: 0.6rem;
+}
+
+/*懒加载部分的自定义css
+ * */
+div#loading{
+	text-align: center;
+	font-size: 0.4rem;
+	line-height: 0.6rem;
+}
+div.loading::before{
+	content: "加载中ing";
+}
+div.nomore::before{
+	content: "没有更多了";
+}
+
+/*弹出层的效果，自定义部分
+ */
+.layerEle>div{
+	font-size: 0.4rem;
+	height: auto;
+}
+.layerEle>div:nth-of-type(1){
+	line-height: 1rem;
+}
+.layerEle>div>span{
+	font-size: 0.36rem;
+	line-height: 0.8rem;
+}

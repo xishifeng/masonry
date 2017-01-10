@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="initial-scale=1.0,user-scalable=no,maximum-scale=1">
+		<title></title>
+		<link rel="stylesheet" href="css/pb2.css" />
+	</head>
+
+	<body>
+		<header>模拟ajax分页加载数据</header>
+		<section id="chengHeight"></section>
+		<ul>
+			<li class="l-li"></li>
+			<li class="r-li"></li>
+		</ul>
+		<div id="loading" class="loading"></div>
+
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="js/lazyload2.js"></script>
+		<script type="text/javascript" src="js/layer.js"></script>
+		<script type="text/javascript">
+			function shiPei() {
+				var w = document.documentElement.clientWidth;
+				var oHtml = document.getElementsByTagName("html")[0];
+				oHtml.style.fontSize = w / 750 * 100 + "px";
+				window.onresize = function() {
+					var w = document.documentElement.clientWidth;
+					var oHtml = document.getElementsByName("html")[0];
+					oHtml.style.fontSize = w / 750 * 100 + "px";
+				}
+			}
+			shiPei();
+			//比这个适配，还是用flexbile好
+
+			var page = 0;
+			window.onload = function() {
+				common.loadAjax(0);
+				page++;
+			}
+
+			var ajaxGetting = true; //ajax是否可以执行
+			$(window).scroll(function() {
+				setTimeout(function() {
+					var scrollTop = $(this).scrollTop();
+					var scrollHeight = $(document).height();
+					var windowHeight = $(this).height();
+					var distance = Math.max(scrollHeight - scrollTop - windowHeight);
+					if(distance < 100) {
+						if(ajaxGetting) {
+							common.loadAjax(page);
+							page++;
+						} else {
+							return false;
+						}
+					}
+				}, 200); //延迟一秒钟执行，看到过程
+
+			});
+
+			var common = {
+				weiCuo: function() {
+					return new Date().getTime();
+				},
+				loadAjax: function(page) {
+					var url = "js/pic-list-" + page + ".json?";
+					$.ajax({
+						type: "get",
+						dataType: "json",
+						data: null,
+						cache: false, //通过给URL添加时间戳来禁用浏览器缓存
+						url: url,
+						async: true,
+						success: function(ret) {
+							if(!ret.data.length) {
+								$(window).unbind("scroll");
+								ajaxGetting = false;
+								console.log("no more json");
+								$("#loading").removeClass().addClass("nomore");
+							} else {
+								for(var i = 0; i < ret.data.length; i++) {
+									var newHtml = common.renderHtml(ret.data[i]);//使common.loadAjax更具通用性
+									common.addHtml(newHtml);
+									$("img[src2]").Jlazyload({
+										type: "image"
+									}); //添加懒加载的事件
+								}
+							}
+						},
+						error: function(data) {
+							return null;
+							//貌似是必要的，防止加载第六个时控制台报错
+						}
+					});
+				},
+				addHtml: function(aHtml) {
+					if(this.compareHeight()) {
+						$(aHtml).appendTo(".l-li");
+					} else {
+						$(".r-li").append(aHtml);
+					}
+				},
+				renderHtml: function(r) {
+					var rid = r.id,
+						rsrc = r.src,
+						rbl = r.bl,
+						rir = r.isRecommend;//r的属性写在render里，更具有普遍性
+					var html = "<div><img class='lazy' src2='" + rsrc + "?" + common.weiCuo() + "' id='img" + (rid + 1) + "' data-bl='" + rbl + "' /><p>第" + (rid + 1) + "张</p>"+(rir==1?"<span class='log-re'></span>":"")+"</div>";
+					return html;
+				},
+				countBl: function(arr) {
+					var blNum = 0;
+					for(var i = 0; i < arr.length; i++) {
+						var pars = Number($(arr[i]).attr("data-bl")) + 0.16;
+						//加上0.16的p标签高度
+						blNum += pars;
+					}
+					return blNum;
+				},
+				compareHeight: function() {
+					var leftHeight = this.countBl($(".l-li img"));
+					var rightHeight = this.countBl($(".r-li img"));
+					return leftHeight <= rightHeight ? true : false;
+				}
+			}
+
+			//解决动态加载元素的事件绑定，事件委托
+			$(document).on("click", "img", function() {
+				layer.open({
+					className: "layerEle",
+					content: "确定删除照片吗？",
+					btn: ['取消', '确定']
+				})
+			});
+		</script>
+	</body>
+
+</html>
